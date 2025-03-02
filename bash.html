@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultimate Futuristic Birthday Countdown</title>
+    <style>
+        /* Global Styles */
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #1a1a1a, #000000);
+            overflow: hidden;
+            font-family: 'Orbitron', sans-serif;
+            transition: background 1s ease;
+        }
+
+        /* Countdown Container */
+        .countdown-container {
+            text-align: center;
+            background: rgba(0, 0, 0, 0.9);
+            padding: 60px;
+            border-radius: 20px;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.7), 0 0 40px rgba(255, 0, 0, 0.5), 0 0 80px rgba(255, 0, 0, 0.3);
+            animation: glow 2s infinite alternate;
+            position: relative;
+            z-index: 1;
+        }
+
+        .countdown {
+            font-size: 4.5em;
+            color: #ff0000;
+            text-shadow: 0 0 10px #ff0000, 0 0 20px #ff0000, 0 0 30px #ff0000;
+            letter-spacing: 5px;
+            transition: color 1s ease;
+        }
+
+        h1 {
+            color: #ff0000;
+            text-shadow: 0 0 10px #ff0000, 0 0 20px #ff0000;
+            font-size: 3em;
+            margin-bottom: 30px;
+            letter-spacing: 3px;
+            transition: color 1s ease;
+        }
+
+        /* Glow Animation */
+        @keyframes glow {
+            0% {
+                box-shadow: 0 0 20px rgba(255, 0, 0, 0.7), 0 0 40px rgba(255, 0, 0, 0.5), 0 0 80px rgba(255, 0, 0, 0.3);
+            }
+            100% {
+                box-shadow: 0 0 30px rgba(255, 0, 0, 0.9), 0 0 60px rgba(255, 0, 0, 0.7), 0 0 120px rgba(255, 0, 0, 0.5);
+            }
+        }
+
+        /* Dynamic Background Animation */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255, 0, 0, 0.1) 10%, transparent 20%);
+            background-size: 20px 20px;
+            animation: moveBackground 10s linear infinite;
+            z-index: 0;
+        }
+
+        @keyframes moveBackground {
+            0% {
+                transform: translateY(0) translateX(0);
+            }
+            100% {
+                transform: translateY(-100%) translateX(-100%);
+            }
+        }
+
+        /* Celebration Effect */
+        .celebration {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #ff0000;
+            animation: confetti-fall 5s linear infinite;
+        }
+
+        @keyframes confetti-fall {
+            0% {
+                transform: translateY(-10vh) rotate(0deg);
+            }
+            100% {
+                transform: translateY(110vh) rotate(720deg);
+            }
+        }
+
+        /* Fireworks Explosion */
+        .firework {
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            background: #ff0000;
+            border-radius: 50%;
+            animation: explode 1.5s ease-out infinite;
+        }
+
+        @keyframes explode {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(20);
+                opacity: 0;
+            }
+        }
+
+        /* Progress Bar */
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: rgba(255, 0, 0, 0.3);
+            border-radius: 5px;
+            margin-top: 20px;
+            overflow: hidden;
+        }
+
+        .progress {
+            height: 100%;
+            background: #ff0000;
+            width: 0;
+            transition: width 1s linear;
+        }
+
+        /* Play Music Button */
+        .play-music-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            padding: 10px 20px;
+            background: rgba(255, 0, 0, 0.7);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1em;
+            z-index: 3;
+        }
+
+        .play-music-button:hover {
+            background: rgba(255, 0, 0, 1);
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Play Music Button -->
+    <button class="play-music-button" id="play-music-button">Play Music</button>
+
+    <div class="countdown-container">
+        <h1 id="countdown-title">Birthday Countdown</h1>
+        <div class="countdown" id="countdown">00:00:00:00</div>
+        <div class="progress-bar">
+            <div class="progress" id="progress"></div>
+        </div>
+    </div>
+
+    <!-- Celebration Confetti -->
+    <div class="celebration" id="celebration"></div>
+
+    <!-- Background Music -->
+    <audio id="background-music" loop>
+        <source src="Kawtar_-_Ya_Lalali__Sped_Up_(128k).mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+
+    <script>
+        // Set the target date (2 days from now) or retrieve from localStorage
+        let countDownDate = localStorage.getItem('countDownDate');
+        if (!countDownDate) {
+            countDownDate = new Date();
+            countDownDate.setDate(countDownDate.getDate() + 2);
+            localStorage.setItem('countDownDate', countDownDate);
+        } else {
+            countDownDate = new Date(countDownDate);
+        }
+
+        // Update the countdown every 1 second
+        const x = setInterval(function() {
+            const now = new Date().getTime();
+            let distance = countDownDate - now;
+
+            // If the countdown is over, reset it to 2 days in the future
+            if (distance < 0) {
+                countDownDate = new Date();
+                countDownDate.setDate(countDownDate.getDate() + 2);
+                localStorage.setItem('countDownDate', countDownDate);
+                distance = countDownDate - now;
+                startCelebration();
+                startFireworks();
+            }
+
+            // Time calculations for days, hours, minutes, and seconds
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            // Display the result in the countdown element
+            document.getElementById("countdown").innerHTML = 
+                `${days}d ${hours}h ${minutes}m ${seconds}s`;
+
+            // Update progress bar
+            const totalTime = 2 * 24 * 60 * 60 * 1000; // 2 days in milliseconds
+            const elapsedTime = totalTime - distance;
+            const progressPercent = (elapsedTime / totalTime) * 100;
+            document.getElementById("progress").style.width = `${progressPercent}%`;
+        }, 1000);
+
+        // Function to create confetti
+        function startCelebration() {
+            const celebration = document.getElementById("celebration");
+            for (let i = 0; i < 200; i++) {
+                const confetti = document.createElement("div");
+                confetti.classList.add("confetti");
+                confetti.style.left = `${Math.random() * 100}vw`;
+                confetti.style.animationDelay = `${Math.random() * 5}s`;
+                confetti.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
+                celebration.appendChild(confetti);
+            }
+        }
+
+        // Function to create fireworks
+        function startFireworks() {
+            const celebration = document.getElementById("celebration");
+            for (let i = 0; i < 50; i++) {
+                const firework = document.createElement("div");
+                firework.classList.add("firework");
+                firework.style.left = `${Math.random() * 100}vw`;
+                firework.style.top = `${Math.random() * 100}vh`;
+                firework.style.animationDelay = `${Math.random() * 2}s`;
+                firework.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
+                celebration.appendChild(firework);
+            }
+        }
+
+        // Interactive Fireworks on Click
+        document.addEventListener('click', (e) => {
+            const firework = document.createElement("div");
+            firework.classList.add("firework");
+            firework.style.left = `${e.clientX}px`;
+            firework.style.top = `${e.clientY}px`;
+            firework.style.animationDelay = "0s";
+            firework.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
+            document.getElementById("celebration").appendChild(firework);
+        });
+
+        // Automatic Theme Switching
+        const themes = [
+            { background: '#1a1a1a', color: '#ff0000' },
+            { background: '#000033', color: '#00ff00' },
+            { background: '#330000', color: '#0000ff' }
+        ];
+        let currentTheme = 0;
+        setInterval(() => {
+            currentTheme = (currentTheme + 1) % themes.length;
+            document.body.style.background = `linear-gradient(135deg, ${themes[currentTheme].background}, #000000)`;
+            document.querySelector('.countdown').style.color = themes[currentTheme].color;
+            document.querySelector('h1').style.color = themes[currentTheme].color;
+        }, 5000); // Change theme every 5 seconds
+
+        // Play Music on Button Click
+        document.getElementById("play-music-button").addEventListener('click', () => {
+            const audio = document.getElementById("background-music");
+            audio.play();
+            document.getElementById("play-music-button").style.display = "none"; // Hide button after playing
+        });
+    </script>
+</body>
+</html>
